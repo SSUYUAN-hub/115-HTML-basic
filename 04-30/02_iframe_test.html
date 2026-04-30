@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Dictionary Search</title>
+    <style>
+        table {
+            margin: auto;
+            text-align: center;
+            height: 90vh;
+            /* 增加高度以便觀察 */
+            width: 80%;
+        }
+
+        td {
+            border: 2px solid black;
+            height: 33%;
+            /* 讓三個 iframe 平分高度 */
+        }
+
+        .test {
+            padding: 10px;
+            text-align: center;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test">
+        <input type="text" id="keyword" placeholder="輸入單字">
+        <button type="button" onclick="searchDictionaries()">查詢</button>
+    </div>
+
+    <table>
+        <tr>
+            <td><iframe id="dict1" src="" frameborder="0"></iframe></td>
+        </tr>
+        <tr>
+            <td><iframe id="dict2" src="" frameborder="0"></iframe></td>
+        </tr>
+        <tr>
+            <td><iframe id="dict3" src="" frameborder="0"></iframe></td>
+        </tr>
+    </table>
+
+    <script>
+        function searchDictionaries() {
+            // 取得輸入框的值
+            const word = document.getElementById('keyword').value;
+            if (!word) return alert("請輸入單字");
+
+            // 定義各家字典的查詢路徑
+            // 1. 維基百科
+            document.getElementById('dict1').src = `https://zh.wikipedia.org/wiki/${word}`;
+
+            // 2. 韋氏字典 (Merriam-Webster)
+            document.getElementById('dict2').src = `https://www.merriam-webster.com/dictionary/${word}`;
+
+            // 3. Urban Dictionary
+            document.getElementById('dict3').src = `https://www.urbandictionary.com/define.php?term=${word}`;
+        }
+    </script>
+</body>
+
+</html>
