@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 外部載入 -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ID選擇器 */
+        /* 第二層權重第1 */
+        #MyId {
+            color: green;
+        }
+
+        /* 類別選擇器 */
+        /* 第二層權重第2 */
+        .test {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 行內式權重最高 -->
+    <div class="test">
+        <h1 id="MyId" style="color:blue;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis, voluptatum!
+        </h1>
+    </div>
+    <!-- 外部載入 -->
+    <!-- 權重最低，但適合多重檔案同時套用 -->
+    <div class="text-color">
+        <h1>Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis, voluptatum!</h1>
+    </div>
+    <!-- 外部載入權重比第二層選擇器低 -->
+    <div class="text-color">
+        <h1 id="MyId">Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis, voluptatum!</h1>
+    </div>
+</body>
+<!-- 行內式權重最高，優先顯示 style="" -->
+<!-- ID選擇器第二層優先 # -->
+<!-- 類別選擇器第二層次要 . -->
+<!-- 外部載入權重最後 <link rel="stylesheet" href="style.css">-->
+</html>
