@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 依照類型選取統一設定 */
+        input[type='text'] {
+            background-color: lightpink;
+
+        }
+
+        input[type='number'] {
+            background-color: lightblue;
+        }
+
+        /* 依照字串類別直接選取統一設定 */
+        [class ^='box post'] {
+            width: 80%;
+            height: 20vh;
+            text-align: center;
+            margin: auto;
+            font-size: 20px;
+            background-color: lightpink;
+        }
+
+        [class ^='box box'] {
+            width: 80%;
+            height: 20vh;
+            text-align: center;
+            margin: auto;
+            font-size: 20px;
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="">
+        <p>
+            <label for="">姓名</label>
+        </p>
+        <input type="text" name="" id="">
+        <p>
+            <label for="">地址</label>
+        </p>
+        <input type="text" name="" id="">
+        <p>
+            <label for="">座號</label>
+        </p>
+        <input type="number" name="" id="">
+    </form>
+
+    <table style="margin: auto;">
+        <tr>
+            <td class="box post1">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, dolor.
+            </td>
+        </tr>
+        <tr>
+            <td class="box post2">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, dolor.
+            </td>
+        </tr>
+        <tr>
+            <td class="box box1">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, dolor.
+            </td>
+        </tr>
+        <tr>
+            <td class="box box2">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, dolor.
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

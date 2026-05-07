@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 設定單數行 */
+        tr:nth-child(odd) {
+            background-color: red;
+        }
+
+        /* 設定雙數行 */
+        tr:nth-child(even) {
+            background-color: lightgreen;
+        }
+
+        table {
+            width: 100%;
+            margin: auto;
+        }
+
+        td {
+            /* width: 100%; */
+            height: 20vh;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Demo of :nth-child</h1>
+    <table>
+        <tr>
+            <td>
+                <p>The first paragraph.</p>
+            </td>
+            <td>
+                <p class="test">The first paragraph.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>The second paragraph.</p>
+            </td>
+            <td>
+                <p class="test">The second paragraph.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>The third paragraph.</p>
+            </td>
+            <td>
+                <p class="test">The third paragraph.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>The fourth paragraph.</p>
+            </td>
+            <td>
+                <p class="test">The fourth paragraph.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
