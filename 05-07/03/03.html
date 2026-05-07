@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寵物商城 </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+        crossorigin="anonymous" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fffbf0 0%, #fef5e7 100%);
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 30px auto;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        tr:first-child {
+            background: linear-gradient(90deg, #f4d9c9 0%, #f0e6d8 100%);
+            font-weight: bold;
+            font-size: 18px;
+            color: #5a4a42;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fffdf5;
+        }
+
+        tr:nth-child(odd):not(:first-child) {
+            background-color: #fef9f3;
+        }
+
+        td {
+            border: 1px solid #e8d5c4;
+            padding: 20px;
+            vertical-align: middle;
+            color: #4a3f3a;
+        }
+
+        tr:first-child td {
+            padding: 20px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr td:first-child {
+            border-left: none;
+        }
+
+        tr td:last-child {
+            border-right: none;
+        }
+
+        tr:first-child td:first-child {
+            border-left: none;
+            border-top: none;
+            border-top-left-radius: 20px;
+        }
+
+        tr:first-child td:last-child {
+            border-right: none;
+            border-top: none;
+            border-top-right-radius: 20px;
+        }
+
+        tr:last-child td:first-child {
+            border-left: none;
+            border-bottom: none;
+            border-bottom-left-radius: 20px;
+        }
+
+        tr:last-child td:last-child {
+            border-right: none;
+            border-bottom: none;
+            border-bottom-right-radius: 20px;
+        }
+
+        .box1 {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .box1:hover img {
+            transform: scale(1.05);
+        }
+
+        .text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #6b5644;
+            letter-spacing: 1px;
+        }
+
+        .text1 {
+            width: 80%;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #7a6f6a;
+        }
+
+        .price,
+        .howmuch {
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: #d97706;
+        }
+
+        .price::before,
+        .howmuch::before {
+            content: '$NT ';
+            font-size: 14px;
+        }
+
+        .price::after,
+        .howmuch::after {
+            content: ' 元';
+        }
+
+        .howmany {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .qty {
+            width: 80px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #d4b5a0;
+            border-radius: 10px;
+            text-align: center;
+            background: linear-gradient(135deg, #fef9f3 0%, #fffbf0 100%);
+            color: #4a3f3a;
+            transition: all 0.3s ease;
+            cursor: text;
+        }
+
+        .qty:focus {
+            outline: none;
+            border-color: #d97706;
+            background: #fffbf0;
+            box-shadow: 0 0 8px rgba(217, 119, 6, 0.2);
+        }
+
+        /* 這段是隱藏上下箭頭 */
+        .qty::-webkit-outer-spin-button,
+        .qty::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .qty[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .total {
+            background: linear-gradient(90deg, #d4b5a0 0%, #c9a892 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+            padding: 20px !important;
+            letter-spacing: 2px;
+        }
+
+        .header {
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        #totalDisplay {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        #discountMessage {
+            font-size: 16px;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+            min-height: 20px;
+        }
+
+        #finalPrice {
+            font-size: 28px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            table {
+                margin: 20px auto;
+            }
+
+            td {
+                padding: 15px 10px;
+                font-size: 14px;
+            }
+
+            .text {
+                font-size: 16px;
+            }
+
+            .box1 {
+                width: 100px;
+                height: 100px;
+            }
+
+            .qty {
+                width: 70px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1 style="color: lightseagreen;"><i class="fa-solid fa-cat"></i>萌貓寵物城</h1>
+    </div>
+    <table>
+        <tr style="text-align: center;">
+            <td colspan="3">商品介紹</td>
+            <!-- <td></td> -->
+            <!-- <td></td> -->
+            <td>價格</td>
+            <td>數量</td>
+            <td>小計</td>
+        </tr>
+        <tr>
+            <td class="box1"><img src="./images/cat1.jpg"></td>
+            <td class="text">自動貓砂機</td>
+            <td class="text1">智慧感應自動清潔設計，可快速清除貓砂異味與結塊，減少鏟砂負擔，維持環境乾淨衛生，適合忙碌的養貓家庭使用。</td>
+            <td class="price">3980</td>
+            <td class="howmany"><input type="number" class="qty" placeholder="0" min="0"></td>
+            <td class="howmuch">0</td>
+        </tr>
+        <tr>
+            <td class="box1"><img src="./images/cat2.jpg"></td>
+            <td class="text">自動餵食機</td>
+            <td class="text1">可定時定量餵食，避免寵物暴飲暴食，即使外出上班也能安心照顧毛孩，支援多餐設定與乾糧儲存功能。</td>
+            <td class="price">1980</td>
+            <td class="howmany"><input type="number" class="qty" placeholder="0" min="0"></td>
+            <td class="howmuch">0</td>
+        </tr>
+        <tr>
+            <td class="box1"><img src="./images/cat3.jpg"></td>
+            <td class="text">寵物飲水機</td>
+            <td class="text1">循環過濾活水系統，保持飲水乾淨新鮮，提高毛孩飲水意願，低噪音設計不影響生活，適合貓狗日常使用。</td>
+            <td class="price">1280</td>
+            <td class="howmany"><input type="number" class="qty" placeholder="0" min="0"></td>
+            <td class="howmuch">0</td>
+        </tr>
+        <tr>
+            <td class="box1"><img src="./images/cat4.jpg"></td>
+            <td class="text">寵物跑步機</td>
+            <td class="text1">專為寵物設計的安全運動設備，可幫助消耗精力、控制體重與提升健康，速度可調整，適合室內活動不足的毛孩。</td>
+            <td class="price">2980</td>
+            <td class="howmany"><input type="number" class="qty" placeholder="0" min="0"></td>
+            <td class="howmuch">0</td>
+        </tr>
+    </table>
+    <br>
+    <table>
+        <tr>
+            <td class="total">
+                <div id="totalDisplay">
+                    <div id="discountMessage"></div>
+                    <div id="finalPrice">$NT 0 元</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <script>
+        const qtyInputs = document.querySelectorAll(".qty");
+        qtyInputs.forEach(function (input) {
+            input.addEventListener("input", function () {
+                // 陣列搜尋資料
+                let row = input.parentElement.parentElement;
+                // 取得商品的單價
+                let price = row.querySelector(".price").innerText;
+                // 取得購買的數量
+                let qty = parseInt(input.value) || 0;
+                // 計算金額小計
+                let howmuch = price * qty;
+                // 更新小計欄位
+                row.querySelector(".howmuch").innerText = howmuch;
+                // 更新總金額
+                updateTotal();
+            });
+        });
+
+        function updateTotal() {
+
+            const allhowmuch = document.querySelectorAll('.howmuch');
+            let total = 0;
+
+            allhowmuch.forEach(function (item) {
+                total += parseInt(item.innerText);
+            })
+
+            // 折扣計算判斷
+            let finalTotal = total;
+            let discountMessage = '';
+
+            if (total >= 10000) {
+                finalTotal = total * 0.8;
+                discountMessage = `🎉 消費累計滿 10000 元，獲得 8 折優惠！`;
+            } else if (total >= 6000) {
+                finalTotal = total * 0.9;
+                discountMessage = `🎁 消費累計滿 6000 元，獲得 9 折優惠！`;
+            }
+
+            // 加入折扣提示訊息
+            const discountEl = document.getElementById('discountMessage');
+            if (discountMessage) {
+                discountEl.innerText = discountMessage;
+            } else {
+                discountEl.innerText = '';
+            }
+
+            // 更新總金額
+            const finalPriceEl = document.getElementById('finalPrice');
+            finalPriceEl.innerText = `$NT ${finalTotal} 元`;
+        }
+    </script>
+</body>
+
+</html>
