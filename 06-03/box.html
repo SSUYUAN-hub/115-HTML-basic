@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box {
+            width: 600px;
+            height: 500px;
+            background-color: lightblue;
+            margin: auto;
+            border-radius: 20px;
+        }
+
+        .input-box {
+            width: 600px;
+            height: 300px;
+            background-color: lightgreen;
+            margin: auto;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 20px;
+        }
+
+        .item {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+        }
+
+        .item1 {
+            background-color: yellow;
+        }
+
+        .item2 {
+            background-color: blue;
+        }
+
+        .item3 {
+            background-color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box"></div>
+    <div class="input-box">
+        <div class="item item1"></div>
+        <div class="item item2"></div>
+        <div class="item item3"></div>
+
+    </div>
+
+    <script>
+//先使用let綁定要設定的東西
+let box = document.querySelector('.box');
+let item1 = document.querySelector('.item1');
+let item2 = document.querySelector('.item2');
+let item3 = document.querySelector('.item3');
+
+//使用addEventListener執行，第一個參數是要做什麼的參數名稱，第二個參數是要執行的動作
+item1.addEventListener('click',function(){
+console.log("item1被點擊了");
+box.setAttribute('style','background-color:yellow');
+})
+item2.addEventListener('click',function(){
+console.log("item2被點擊了");
+box.setAttribute('style','background-color:blue');
+
+//這樣寫會把原本的class覆蓋掉，所以不建議這樣寫
+//box.setAttribute('class','box item2'); 
+
+//這樣寫會把原本的class保留，並且新增一個class，所以建議這樣寫
+//box.classList.add('item2'); 
+
+//這樣寫會直接修改style屬性，不會覆蓋掉原本的style屬性，所以建議這樣寫
+//box.style.backgroundColor = 'blue'; 
+
+})
+item3.addEventListener('click',function(){
+console.log("item3被點擊了");
+box.setAttribute('style','background-color:red');
+})
+
+//類似print_r的功能，秀出綁定的結果
+console.log("Hello JS");
+console.log(box);
+console.log(item1);
+console.log(item2);
+console.log(item3);
+    </script>
+</body>
+
+</html>

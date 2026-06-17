@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box {
+            width: 150px;
+            height: 150px;
+            background-color: blueviolet;
+        }
+        .box2 {
+            width: 300px;
+            height: 150px;
+            background-color: blueviolet;
+            background-image: url(./cat3.png);
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body>
+    直接加在div斷落的img <br>
+    <div class="box">
+        <img src="./cat3.png" alt="" width="100px" height="100px">
+    </div>
+    <hr>
+    加入.box background 的img <br>
+    <div class="box2">
+
+    </div>
+    <hr>
+    沒使用任何容器的img <br>
+    <img src="./cat3.png" alt="" width="100px" height="100px">
+</body>
+
+</html>

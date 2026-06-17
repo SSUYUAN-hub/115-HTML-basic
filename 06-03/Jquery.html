@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <title>Document</title>
+    <style>
+        .box {
+            width: 600px;
+            height: 500px;
+            background-color: lightblue;
+            margin: auto;
+            border-radius: 20px;
+        }
+
+        .input-box {
+            width: 600px;
+            height: 300px;
+            background-color: lightgreen;
+            margin: auto;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 20px;
+        }
+
+        .item {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+        }
+
+        .item1 {
+            background-color: yellow;
+        }
+
+        .item2 {
+            background-color: blue;
+        }
+
+        .item3 {
+            background-color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box"></div>
+    <div class="input-box">
+        <div class="item item1" data-color="item1"></div>
+        <div class="item item2" data-color="item2"></div>
+        <div class="item item3" data-color="item3"></div>
+
+    </div>
+
+    <script>
+//先使用let綁定要設定的東西
+$(document).ready(function() {
+let box = $('.box');
+let colorBtn = $('.item');
+//console是類似於print的功能，可以在console裡面看到你想要的東西，方便debug
+console.log('colorBtn', colorBtn);
+
+colorBtn.click(function(){
+console.log("colorBtn被點擊了");
+console.log('this', this);
+let getcolor = $(this).attr('data-color');
+console.log('getcolor', getcolor);
+let tmpText = `box ${getcolor}`;
+console.log('tmpText', tmpText);
+box.attr('class', tmpText);
+});
+
+});
+
+
+    </script>
+</body>
+
+</html>

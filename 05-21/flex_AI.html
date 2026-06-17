@@ -1,0 +1,937 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>週/月行事曆</title>
+    <style>
+        :root {
+            --bg: #050816;
+            --page: rgba(10, 16, 36, 0.85);
+            --panel: rgba(8, 18, 44, 0.95);
+            --panel-strong: rgba(15, 29, 64, 0.98);
+            --text: #f8f8ff;
+            --text-muted: #9db4ff;
+            --accent: #5d6cff;
+            --accent-2: #26d0ff;
+            --accent-soft: rgba(38, 208, 255, 0.12);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            --danger: #ff5f7a;
+            --label-work: #6366f1;
+            --label-personal: #10b981;
+            --label-important: #f97316;
+            --label-other: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top, rgba(80, 120, 255, 0.16), transparent 25%),
+                linear-gradient(180deg, #02040d 0%, #050816 55%, #01030a 100%);
+            color: var(--text);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 10%, rgba(38, 208, 255, 0.18), transparent 14%),
+                radial-gradient(circle at 80% 5%, rgba(248, 101, 255, 0.14), transparent 12%),
+                radial-gradient(circle at 50% 60%, rgba(92, 67, 255, 0.12), transparent 18%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
+        }
+
+        .top-bar {
+            display: grid;
+            gap: 18px;
+            margin-bottom: 24px;
+            padding: 22px 24px;
+            border-radius: 32px;
+            background: rgba(10, 16, 36, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .title-group h1 {
+            margin: 0;
+            font-size: clamp(2rem, 3vw, 3.4rem);
+            letter-spacing: 0.04em;
+            color: #eff4ff;
+            text-shadow: 0 0 20px rgba(93, 108, 255, 0.45);
+        }
+
+        .title-group p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 740px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .view-toggle,
+        .week-nav {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(15, 23, 55, 0.9);
+            border-radius: 999px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .view-toggle button,
+        .week-nav button {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 10px 18px;
+            background: transparent;
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        .view-toggle button:hover,
+        .week-nav button:hover {
+            transform: translateY(-1px);
+        }
+
+        .view-toggle button.active,
+        .week-nav button.active {
+            background: linear-gradient(135deg, rgba(38, 208, 255, 0.22), rgba(93, 108, 255, 0.22));
+            color: #eff4ff;
+            box-shadow: 0 0 20px rgba(38, 208, 255, 0.24);
+        }
+
+        .search-box {
+            position: relative;
+            width: min(340px, 100%);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(8, 13, 30, 0.92);
+            color: var(--text);
+            outline: none;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .search-box input::placeholder {
+            color: rgba(157, 180, 255, 0.6);
+        }
+
+        .week-label {
+            font-weight: 700;
+            color: #f8f8ff;
+            min-width: 240px;
+            text-align: center;
+        }
+
+        .calendar-container {
+            display: grid;
+            gap: 16px;
+        }
+
+        .monthly-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .monthly-grid .day-label {
+            text-align: center;
+            padding: 12px 0;
+            color: rgba(157, 180, 255, 0.85);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.82rem;
+        }
+
+        .day-card {
+            background: rgba(8, 16, 36, 0.95);
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 20px 80px rgba(13, 25, 65, 0.45);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 260px;
+            position: relative;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 26px 90px rgba(13, 25, 65, 0.55);
+        }
+
+        .day-card.today {
+            border-color: rgba(38, 208, 255, 0.7);
+            box-shadow: 0 28px 100px rgba(38, 208, 255, 0.18);
+        }
+
+        .day-card.other-month {
+            opacity: 0.6;
+        }
+
+        .day-header {
+            display: grid;
+            gap: 10px;
+        }
+
+        .day-date-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .day-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #91a7ff;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .day-date {
+            font-size: 0.92rem;
+            color: #dbe4ff;
+            background: rgba(38, 208, 255, 0.1);
+            border: 1px solid rgba(38, 208, 255, 0.18);
+            border-radius: 999px;
+            padding: 8px 12px;
+        }
+
+        .add-day-button {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(38, 208, 255, 0.16), rgba(93, 108, 255, 0.2));
+            color: #eff4ff;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        }
+
+        .event-list {
+            display: grid;
+            gap: 12px;
+            flex: 1;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .event-card {
+            background: rgba(17, 29, 56, 0.9);
+            border-radius: 20px;
+            padding: 16px;
+            display: grid;
+            gap: 10px;
+            color: var(--text-muted);
+            min-height: 70px;
+            position: relative;
+            border-left: 4px solid transparent;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        }
+
+        .event-card.work {
+            border-left-color: var(--label-work);
+        }
+
+        .event-card.personal {
+            border-left-color: var(--label-personal);
+        }
+
+        .event-card.important {
+            border-left-color: var(--label-important);
+        }
+
+        .event-card.other {
+            border-left-color: var(--label-other);
+        }
+
+        .event-card strong {
+            color: var(--text);
+            font-size: 0.96rem;
+            display: block;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+        }
+
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.86rem;
+        }
+
+        .event-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: white;
+            text-transform: capitalize;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge.work {
+            background: var(--label-work);
+        }
+
+        .badge.personal {
+            background: var(--label-personal);
+        }
+
+        .badge.important {
+            background: var(--label-important);
+        }
+
+        .badge.other {
+            background: var(--label-other);
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .small-button {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: background 0.22s ease, transform 0.22s ease;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .small-button:hover {
+            transform: translateY(-1px);
+            background: rgba(38, 208, 255, 0.14);
+        }
+
+        .small-button--secondary {
+            background: rgba(38, 208, 255, 0.14);
+            color: #e6f7ff;
+            border-color: rgba(38, 208, 255, 0.32);
+        }
+
+        .small-button--danger {
+            background: rgba(255, 95, 122, 0.14);
+            color: #ffb3c7;
+            border-color: rgba(255, 95, 122, 0.32);
+        }
+
+        .empty-state {
+            color: rgba(157, 180, 255, 0.8);
+            font-size: 0.92rem;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(18px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            z-index: 30;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            width: min(520px, 100%);
+            background: rgba(8, 14, 28, 0.98);
+            border: 1px solid rgba(38, 208, 255, 0.22);
+            border-radius: 32px;
+            padding: 28px;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.5), 0 0 40px rgba(38, 208, 255, 0.18);
+            backdrop-filter: blur(24px);
+        }
+
+        .modal h2 {
+            margin: 0 0 8px;
+            font-size: 1.7rem;
+            color: #eff4ff;
+            text-shadow: 0 0 16px rgba(93, 108, 255, 0.35);
+        }
+
+        .modal p {
+            margin: 0 0 22px;
+            color: rgba(157, 180, 255, 0.85);
+            font-size: 0.98rem;
+        }
+
+        .modal form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .modal label {
+            display: grid;
+            gap: 8px;
+            font-weight: 700;
+            color: rgba(214, 226, 255, 0.9);
+            font-size: 0.96rem;
+        }
+
+        .modal input,
+        .modal textarea,
+        .modal select {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: 16px 18px;
+            font-size: 0.96rem;
+            color: #f8f8ff;
+            background: rgba(16, 24, 46, 0.9);
+            outline: none;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .modal textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .modal textarea {
+            min-height: 104px;
+            resize: vertical;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .button,
+        .button--secondary {
+            border: 1px solid transparent;
+            border-radius: 16px;
+            padding: 14px 22px;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #4f6cff, #26d0ff);
+            color: #eff4ff;
+            box-shadow: 0 18px 32px rgba(38, 208, 255, 0.32), 0 0 24px rgba(93, 108, 255, 0.14);
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 20px 38px rgba(38, 208, 255, 0.4), 0 0 28px rgba(93, 108, 255, 0.22);
+        }
+
+        .button--secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #dbe4ff;
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .button--secondary:hover {
+            background: rgba(38, 208, 255, 0.12);
+            color: #eff4ff;
+        }
+
+        @media (max-width: 980px) {
+            .monthly-grid,
+            .weekly-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .view-toggle,
+            .week-nav {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .weekly-grid,
+            .monthly-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .day-card {
+                min-height: 220px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <section class="top-bar">
+            <div class="title-group">
+                <h1>行事曆</h1>
+
+            </div>
+            <div class="controls">
+                <div class="group">
+                    <div class="view-toggle">
+                        <button id="weekViewButton" class="active" type="button">週</button>
+                        <button id="monthViewButton" type="button">月</button>
+                    </div>
+                    <div class="search-box">
+                        <input id="searchInput" type="search" placeholder="搜尋活動、地點或分類">
+                    </div>
+                </div>
+                <div class="group week-nav">
+                    <button id="prevPeriod" type="button" aria-label="上一週或月">‹</button>
+                    <span id="periodLabel" class="week-label">週行事曆</span>
+                    <button id="nextPeriod" type="button" aria-label="下一週或月">›</button>
+                    <button id="todayButton" type="button" class="button--secondary">今天</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="calendar-container" id="calendarContainer"></section>
+    </main>
+
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal">
+            <h2 id="eventModalTitle">新增活動</h2>
+            <p id="selectedDateText">選擇日期</p>
+            <form id="eventForm">
+                <input type="hidden" id="eventDate" name="eventDate">
+                <input type="hidden" id="eventIndex" name="eventIndex">
+                <label>
+                    時間
+                    <input type="time" id="eventTime" name="eventTime" required>
+                </label>
+                <label>
+                    內容
+                    <textarea id="eventTitle" name="eventTitle" placeholder="輸入活動內容" required></textarea>
+                </label>
+                <label>
+                    地點
+                    <input type="text" id="eventLocation" name="eventLocation" placeholder="輸入活動地點">
+                </label>
+                <label>
+                    分類標籤
+                    <select id="eventCategory" name="eventCategory">
+                        <option value="work">工作</option>
+                        <option value="personal">私人</option>
+                        <option value="important">重要</option>
+                        <option value="other">其他</option>
+                    </select>
+                </label>
+                <div class="actions">
+                    <button type="button" class="button--secondary" id="cancelButton">取消</button>
+                    <button type="submit" class="button">儲存活動</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const calendarContainer = document.getElementById('calendarContainer');
+        const periodLabel = document.getElementById('periodLabel');
+        const weekViewButton = document.getElementById('weekViewButton');
+        const monthViewButton = document.getElementById('monthViewButton');
+        const prevPeriodButton = document.getElementById('prevPeriod');
+        const nextPeriodButton = document.getElementById('nextPeriod');
+        const todayButton = document.getElementById('todayButton');
+        const searchInput = document.getElementById('searchInput');
+        const eventModal = document.getElementById('eventModal');
+        const eventModalTitle = document.getElementById('eventModalTitle');
+        const selectedDateText = document.getElementById('selectedDateText');
+        const eventForm = document.getElementById('eventForm');
+        const eventDateInput = document.getElementById('eventDate');
+        const eventIndexInput = document.getElementById('eventIndex');
+        const eventTimeInput = document.getElementById('eventTime');
+        const eventTitleInput = document.getElementById('eventTitle');
+        const eventLocationInput = document.getElementById('eventLocation');
+        const eventCategoryInput = document.getElementById('eventCategory');
+        const cancelButton = document.getElementById('cancelButton');
+
+        const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const today = new Date();
+        let currentDate = new Date();
+        let currentView = 'week';
+        let events = {};
+        let editingEvent = null;
+        let searchQuery = '';
+
+        function loadEvents() {
+            const stored = localStorage.getItem('calendarEvents');
+            events = stored ? JSON.parse(stored) : {};
+        }
+
+        function saveEvents() {
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+        }
+
+        function formatDateKey(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getWeekStart(date) {
+            const start = new Date(date);
+            start.setHours(0, 0, 0, 0);
+            start.setDate(start.getDate() - start.getDay());
+            return start;
+        }
+
+        function formatPeriodLabel() {
+            if (currentView === 'week') {
+                const start = getWeekStart(currentDate);
+                const end = new Date(start);
+                end.setDate(end.getDate() + 6);
+                return `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()} - ${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}`;
+            }
+            return `${currentDate.getFullYear()} 年 ${currentDate.getMonth() + 1} 月`;
+        }
+
+        const categoryLabels = {
+            work: '工作',
+            personal: '私人',
+            important: '重要',
+            other: '其他'
+        };
+
+        function matchesSearch(eventItem) {
+            if (!searchQuery) return true;
+            const categoryLabel = categoryLabels[eventItem.category] || eventItem.category;
+            const text = `${eventItem.title} ${eventItem.location} ${eventItem.category} ${categoryLabel}`.toLowerCase();
+            return text.includes(searchQuery);
+        }
+
+        function openModal(dateKey, index = null) {
+            const dayLabel = dateKey;
+            eventDateInput.value = dateKey;
+            selectedDateText.textContent = `選擇日期：${dayLabel}`;
+            if (index === null) {
+                eventModalTitle.textContent = '新增活動';
+                eventTimeInput.value = '';
+                eventTitleInput.value = '';
+                eventLocationInput.value = '';
+                eventCategoryInput.value = 'work';
+                eventIndexInput.value = '';
+                editingEvent = null;
+            } else {
+                const eventData = events[dateKey][index];
+                eventModalTitle.textContent = '編輯活動';
+                eventTimeInput.value = eventData.time;
+                eventTitleInput.value = eventData.title;
+                eventLocationInput.value = eventData.location || '';
+                eventCategoryInput.value = eventData.category || 'work';
+                eventIndexInput.value = index;
+                editingEvent = { dateKey, index };
+            }
+            eventModal.classList.add('active');
+        }
+
+        function closeModal() {
+            eventModal.classList.remove('active');
+        }
+
+        function deleteEvent(dateKey, index) {
+            events[dateKey].splice(index, 1);
+            if (!events[dateKey].length) delete events[dateKey];
+            saveEvents();
+            renderCalendar();
+        }
+
+        function createEventCard(item, index, dateKey) {
+            const card = document.createElement('div');
+            card.className = `event-card ${item.category}`;
+            card.innerHTML = `
+                <strong>${item.time} ${item.title}</strong>
+                <div class="event-meta">
+                    <span>地點：${item.location || '未填寫'}</span>
+                    <span class="badge ${item.category}">${item.category}</span>
+                </div>
+            `;
+            const actions = document.createElement('div');
+            actions.className = 'event-actions';
+
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.className = 'small-button small-button--secondary';
+            editButton.textContent = '編輯';
+            editButton.addEventListener('click', e => {
+                e.stopPropagation();
+                openModal(dateKey, index);
+            });
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'small-button small-button--danger';
+            deleteButton.textContent = '刪除';
+            deleteButton.addEventListener('click', e => {
+                e.stopPropagation();
+                deleteEvent(dateKey, index);
+            });
+
+            actions.appendChild(editButton);
+            actions.appendChild(deleteButton);
+            card.appendChild(actions);
+            return card;
+        }
+
+        function renderWeek() {
+            calendarContainer.innerHTML = '';
+            calendarContainer.className = 'calendar-container weekly-grid';
+            periodLabel.textContent = formatPeriodLabel();
+
+            const weekStart = getWeekStart(currentDate);
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(weekStart);
+                date.setDate(date.getDate() + i);
+                const dateKey = formatDateKey(date);
+                const isToday = dateKey === formatDateKey(today);
+
+                const dayCard = document.createElement('div');
+                dayCard.className = `day-card${isToday ? ' today' : ''}`;
+                dayCard.addEventListener('click', () => openModal(dateKey));
+
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.innerHTML = `
+                    <div class="day-date-title">
+                        <div>
+                            <div class="day-name">${weekDays[date.getDay()]}</div>
+                            <div class="day-date">${date.getMonth() + 1}/${date.getDate()}</div>
+                        </div>
+                        <button type="button" class="add-day-button">新增</button>
+                    </div>
+                `;
+                dayHeader.querySelector('button').addEventListener('click', e => {
+                    e.stopPropagation();
+                    openModal(dateKey);
+                });
+
+                const eventList = document.createElement('div');
+                eventList.className = 'event-list';
+                const dayEvents = (events[dateKey] || []).filter(matchesSearch);
+
+                if (!dayEvents.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'empty-state';
+                    empty.textContent = searchQuery ? '無符合搜尋的活動。' : '尚無活動，按「新增」新增一筆。';
+                    eventList.appendChild(empty);
+                } else {
+                    dayEvents.sort((a, b) => a.time.localeCompare(b.time));
+                    dayEvents.forEach((eventItem, index) => {
+                        eventList.appendChild(createEventCard(eventItem, index, dateKey));
+                    });
+                }
+
+                dayCard.appendChild(dayHeader);
+                dayCard.appendChild(eventList);
+                calendarContainer.appendChild(dayCard);
+            }
+        }
+
+        function renderMonth() {
+            calendarContainer.innerHTML = '';
+            calendarContainer.className = 'calendar-container monthly-grid';
+            periodLabel.textContent = formatPeriodLabel();
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const startOffset = firstDay.getDay();
+            const totalCells = 42;
+
+            // weekDays.forEach(day => {
+            //     const label = document.createElement('div');
+            //     label.className = 'day-label';
+            //     label.textContent = day;
+            //     calendarContainer.appendChild(label);
+            // });
+
+            for (let i = 0; i < totalCells; i++) {
+                const date = new Date(year, month, i + 1 - startOffset);
+                const dateKey = formatDateKey(date);
+                const isToday = dateKey === formatDateKey(today);
+                const isCurrentMonth = date.getMonth() === month;
+
+                const dayCard = document.createElement('div');
+                dayCard.className = `day-card${isToday ? ' today' : ''}${isCurrentMonth ? '' : ' other-month'}`;
+                dayCard.addEventListener('click', () => openModal(dateKey));
+
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.innerHTML = `
+                    <div class="day-date-title">
+                        <div>
+                            <div class="day-name">${weekDays[date.getDay()]}</div>
+                            <div class="day-date">${date.getDate()}</div>
+                        </div>
+                    </div>
+                `;
+
+                const eventList = document.createElement('div');
+                eventList.className = 'event-list';
+                const dayEvents = (events[dateKey] || []).filter(matchesSearch);
+
+                if (!dayEvents.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'empty-state';
+                    empty.textContent = searchQuery ? '無符合搜尋的活動。' : '點擊卡片新增活動。';
+                    eventList.appendChild(empty);
+                } else {
+                    dayEvents.sort((a, b) => a.time.localeCompare(b.time));
+                    dayEvents.forEach((eventItem, index) => {
+                        eventList.appendChild(createEventCard(eventItem, index, dateKey));
+                    });
+                }
+
+                dayCard.appendChild(dayHeader);
+                dayCard.appendChild(eventList);
+                calendarContainer.appendChild(dayCard);
+            }
+        }
+
+        function renderCalendar() {
+            if (currentView === 'week') {
+                renderWeek();
+            } else {
+                renderMonth();
+            }
+        }
+
+        function setView(view) {
+            currentView = view;
+            weekViewButton.classList.toggle('active', view === 'week');
+            monthViewButton.classList.toggle('active', view === 'month');
+            renderCalendar();
+        }
+
+        function changePeriod(offset) {
+            if (currentView === 'week') {
+                currentDate.setDate(currentDate.getDate() + offset * 7);
+            } else {
+                currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1);
+            }
+            renderCalendar();
+        }
+
+        eventForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const dateKey = eventDateInput.value;
+            const title = eventTitleInput.value.trim();
+            const time = eventTimeInput.value;
+            const location = eventLocationInput.value.trim();
+            const category = eventCategoryInput.value;
+            const index = eventIndexInput.value;
+
+            if (!title || !time) return;
+
+            if (!events[dateKey]) events[dateKey] = [];
+
+            const eventData = { title, time, location, category };
+
+            if (editingEvent && editingEvent.dateKey === dateKey && index !== '') {
+                events[dateKey][Number(index)] = eventData;
+            } else {
+                events[dateKey].push(eventData);
+            }
+
+            saveEvents();
+            renderCalendar();
+            closeModal();
+        });
+
+        weekViewButton.addEventListener('click', () => setView('week'));
+        monthViewButton.addEventListener('click', () => setView('month'));
+        prevPeriodButton.addEventListener('click', () => changePeriod(-1));
+        nextPeriodButton.addEventListener('click', () => changePeriod(1));
+        todayButton.addEventListener('click', () => {
+            currentDate = new Date(today);
+            renderCalendar();
+        });
+
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value.trim().toLowerCase();
+            renderCalendar();
+        });
+
+        cancelButton.addEventListener('click', closeModal);
+        eventModal.addEventListener('click', e => {
+            if (e.target === eventModal) closeModal();
+        });
+
+        loadEvents();
+        setView('week');
+    </script>
+</body>
+
+</html>
